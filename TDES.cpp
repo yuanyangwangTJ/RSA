@@ -18,15 +18,15 @@ TDES::TDES() {
     // for (int i = 0; i < 16; i++) {
     //     cout << sk[0][i] <<endl;
     // }
-    string s = "1011000100100011010001010110011110001001101010111100110111101111";
-    cout << "字符串：" << s << endl;
-    bitset<64> tmp(s);
-    plain = tmp;
-    cout << "明文为：" << plain << endl;
-    TDESEncrypt();
-    cout << "密文为：" << cipher << endl;
-    TDESDecrypt();
-    cout << "解密为：" << plain << endl;
+    // string s = "1011000100100011010001010110011110001001101010111100110111101111";
+    // cout << "字符串：" << s << endl;
+    // bitset<64> tmp(s);
+    // plain = tmp;
+    // cout << "明文为：" << plain << endl;
+    // TDESEncrypt();
+    // cout << "密文为：" << cipher << endl;
+    // TDESDecrypt();
+    // cout << "解密为：" << plain << endl;
 
 }
 
@@ -211,15 +211,17 @@ bitset<64> TDES::desDecrypt(bitset<64> ciphertext, int n) {
 }
 
 // TDES 加密（三重加密）
-void TDES::TDESEncrypt() {
+bitset<64> TDES::TDESEncrypt() {
     cipher = desEncrypt(plain, 0);
     cipher = desDecrypt(cipher, 1);
     cipher = desEncrypt(cipher, 2);
+    return cipher;
 }
 
 // TDES 解密（三重解密）
-void TDES::TDESDecrypt() {
+bitset<64> TDES::TDESDecrypt() {
     plain = desDecrypt(cipher, 2);
     plain = desEncrypt(plain, 1);
     plain = desDecrypt(plain, 0);
+    return plain;
 }

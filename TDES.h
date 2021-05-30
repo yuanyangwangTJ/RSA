@@ -142,8 +142,8 @@ const int SBox[8][4][16] = {
 class TDES {
 public:
     TDES();
-    void TDESEncrypt();
-    void TDESDecrypt();
+    bitset<64> TDESEncrypt();
+    bitset<64> TDESDecrypt();
     bitset<64> plain, cipher;
 
 private:

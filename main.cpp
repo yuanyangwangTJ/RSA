@@ -1,8 +1,8 @@
-#include "TDES.h"
+#include "Engine.h"
 
 int main()
 {
-    TDES t;
+    PRNG t(8);
 
     return 0;
 }

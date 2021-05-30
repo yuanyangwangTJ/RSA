@@ -7,8 +7,8 @@
 
 # compile and lib parameter
 # CC      := g++
-# CXXFLAGS:= -g -O2 -std=c++11 -pthread -march=native
-# LIBS    := -lntl -lgmp -lm
+CXXFLAGS:= -g -O2 -std=c++11 -pthread -march=native
+LIBS    := -lntl -lgmp -lm
 # LDFLAGS := 
 
 # $(TARGET): $(OBJS)
@@ -21,13 +21,16 @@
 # run:
 # 	@./$(TARGET)
 
-output: main.o TDES.o
-	g++ main.o TDES.o -o output
+output: main.o TDES.o PRNG.o
+	g++ $(CXXFLAGS) main.o TDES.o PRNG.o -o output $(LIBS)
 
 main.o: main.cpp
 	g++ -c main.cpp
 
 TDES.o: TDES.cpp TDES.h
 	g++ -c TDES.cpp
+
+PRNG.o: PRNG.cpp Engine.h
+	g++ -c -std=c++11 -pthread -march=native PRNG.cpp $(LIBS)
 clean:
 	rm -f *.o output
