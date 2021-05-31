@@ -2,11 +2,12 @@
 #define _ENGINE_H_
 
 #include <bitset>
+#include <cstring>
 #include <NTL/ZZ.h>
 
 using std::bitset;
 
-const unsigned char DERTable[] = "0123456789ABBCDEEF";
+const unsigned char DERTable[] = "0123456789ABCDEF";
 
 class PRNG
 {
@@ -20,7 +21,9 @@ public:
     int m;
 
 private:
+    void bitsToString();
     bitset<64> *x;
+    std::string s;
 };
 
 class PrimeGen: public PRNG

@@ -25,5 +25,7 @@ void PrimeGen::GeneratePrime() {
         res = BitsToNumber();
     } while(!ProbPrime(res, m * 32));
     cout << res << endl;
+    
+    PrintInDER();
 
 }

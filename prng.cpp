@@ -19,6 +19,7 @@ typedef unsigned long long size_ul;
 PRNG::PRNG(int n) {
     m = n;
     x = new bitset<64>[m];
+    s = "";
 }
 
 // 析构函数，释放内存空间
@@ -52,6 +53,9 @@ void PRNG::GenerateRandom() {
         td.plain = x[i] ^ Im;
         s = td.TDESEncrypt();
     }
+
+    // 生成字符串类型保存
+    bitsToString();
 }
 
 // 将比特数转化为 ZZ 型数字
@@ -69,13 +73,38 @@ ZZ PRNG::BitsToNumber() {
     return res;
 }
 
+// 比特位转为字符串类型（01字符串）
+void PRNG::bitsToString() {
+    s = "";
+    for (int i = 0; i < m; i++) {
+        s += x[i].to_string();
+    }
+}
+
 // 以十六进制打印比特数值
 void PRNG::PrintInDER() {
-    for (int i = 0; i < m; i++) {
-        string str = x[i].to_string();
-        for (int j = 0; j < 64; j++) {
-            
+    cout << "modulus:";
+    string pairstr = "";
+    for (size_t i = 0; i < s.length(); i += 4) {
+        int index = 0;
+        
+        for (size_t j = i; j < i + 4; j++) {
+            index = index << 1;
+            if (s[j] == '1') {
+                index += 1;
+            }
         }
-
+        pairstr += DERTable[index];
+        if (pairstr.length() == 2) {
+            cout << pairstr;
+            if (i + 4 < s.length()) {
+                cout << ":";
+            }
+            pairstr = "";
+        }
+        if (i % 120 == 0) {
+            cout << endl << '\t';
+        }
     }
+    cout << endl;
 }
