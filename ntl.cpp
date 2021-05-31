@@ -6,10 +6,8 @@ using namespace NTL;
 
 int main()
 {
-    ZZ a, b, c;
-    cin >> a;
-    cin >> b;
-    c = (a + 1) * (b + 1);
-    cout << c << "\n:";
+    ZZ a(123123123);
+    a = a << 13;
+    cout << a ;
     return 0;
 }

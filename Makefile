@@ -21,8 +21,8 @@ LIBS    := -lntl -lgmp -lm
 # run:
 # 	@./$(TARGET)
 
-output: main.o TDES.o PRNG.o
-	g++ $(CXXFLAGS) main.o TDES.o PRNG.o -o output $(LIBS)
+output: main.o TDES.o PRNG.o PrimeGen.o
+	g++ $(CXXFLAGS) main.o TDES.o PRNG.o PrimeGen.o -o output $(LIBS)
 
 main.o: main.cpp
 	g++ -c main.cpp
@@ -32,5 +32,11 @@ TDES.o: TDES.cpp TDES.h
 
 PRNG.o: PRNG.cpp Engine.h
 	g++ -c -std=c++11 -pthread -march=native PRNG.cpp $(LIBS)
+
+PrimeGen.o: PrimeGen.cpp Engine.h
+	g++ -c -std=c++11 -pthread -march=native PrimeGen.cpp $(LIBS)
+
 clean:
 	rm -f *.o output
+run:
+	./output
