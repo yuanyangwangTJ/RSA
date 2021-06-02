@@ -8,9 +8,9 @@
             "name": "gdb Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/${fileBasenameNoExtension}",
+            "program": "${workspaceFolder}/output",
             "args": [],
-            "stopAtEntry": false,
+            "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
@@ -24,12 +24,6 @@
             ],
             "miDebuggerPath": "/usr/bin/gdb",
             "preLaunchTask": "${defaultBuildTask}",
-            "presentation": {
-                "hidden": false,
-                "group": "",
-                "order": 1,
-                "clear": true
-            }
             
         }
     ]

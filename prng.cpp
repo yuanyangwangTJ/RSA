@@ -3,7 +3,7 @@
  * Function: 伪随机数比特生成器
  * ***********************************/
 
-#include "Engine.h"
+#include "Random.h"
 #include "TDES.h"
 #include <iostream>
 #include <ctime>
@@ -35,7 +35,7 @@ void PRNG::SetM(int n) {
 }
 
 // 伪随机数比特生成函数
-void PRNG::GenerateRandom() {
+ZZ PRNG::GenerateRandom() {
     // 获取本地时间日期
     time_t now = time(0);
     bitset<64> Date(now);
@@ -56,10 +56,12 @@ void PRNG::GenerateRandom() {
 
     // 生成字符串类型保存
     bitsToString();
+    ZZ res = bitsToNumber();
+    return res;
 }
 
 // 将比特数转化为 ZZ 型数字
-ZZ PRNG::BitsToNumber() {
+ZZ PRNG::bitsToNumber() {
     ZZ res(0);
     for (int i = 0; i < m; i++) {
         string str = x[i].to_string();

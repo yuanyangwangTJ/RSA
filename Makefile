@@ -21,8 +21,8 @@ LIBS    := -lntl -lgmp -lm
 # run:
 # 	@./$(TARGET)
 
-output: main.o TDES.o PRNG.o PrimeGen.o
-	g++ $(CXXFLAGS) main.o TDES.o PRNG.o PrimeGen.o -o output $(LIBS)
+output: main.o TDES.o PRNG.o PrimeGen.o RSA.o
+	g++ $(CXXFLAGS) main.o TDES.o PRNG.o PrimeGen.o RSA.o -o output $(LIBS)
 
 main.o: main.cpp
 	g++ -c main.cpp
@@ -30,12 +30,16 @@ main.o: main.cpp
 TDES.o: TDES.cpp TDES.h
 	g++ -c TDES.cpp
 
-PRNG.o: PRNG.cpp Engine.h
+PRNG.o: PRNG.cpp Random.h
 	g++ -c -std=c++11 -pthread -march=native PRNG.cpp $(LIBS)
 
-PrimeGen.o: PrimeGen.cpp Engine.h
+PrimeGen.o: PrimeGen.cpp Random.h
 	g++ -c -std=c++11 -pthread -march=native PrimeGen.cpp $(LIBS)
 
+RSA.o: Random.h RSA.h
+	g++ -c -std=c++11 -pthread -march=native RSA.cpp $(LIBS)
+
+.PHONY:
 clean:
 	rm -f *.o output
 run:

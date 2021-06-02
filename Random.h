@@ -1,5 +1,5 @@
-#ifndef _ENGINE_H_
-#define _ENGINE_H_
+#ifndef _RANDOM_H_
+#define _RANDOM_H_
 
 #include <bitset>
 #include <cstring>
@@ -14,14 +14,14 @@ class PRNG
 public:
     PRNG(int);
     ~PRNG();
-    void GenerateRandom();
+    NTL::ZZ GenerateRandom();
     void SetM(int);
-    NTL::ZZ BitsToNumber();
     void PrintInDER();
     int m;
 
 private:
     void bitsToString();
+    NTL::ZZ bitsToNumber();
     bitset<64> *x;
     std::string s;
 };
@@ -30,7 +30,7 @@ class PrimeGen: public PRNG
 {
 public:
     PrimeGen(int);
-    void GeneratePrime();
+    NTL::ZZ GeneratePrime();
 private:
 };
 

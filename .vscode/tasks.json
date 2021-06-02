@@ -8,7 +8,6 @@
             "type": "shell",
             "command": "make",
             "args": [
-                "./${fileBasenameNoExtension}"
             ],
             "group": {
                 "kind": "build",
