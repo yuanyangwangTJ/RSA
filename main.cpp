@@ -10,9 +10,9 @@ int main()
     RSAUser Alice, Bob;
     Alice.GenerateKey();
     Alice.SendPublicKey(Bob);
-    Bob.EncryptMessege();
-    Bob.SendMessege(Alice);
-    Alice.DecryptMessege();
+    Bob.EncryptMessage();
+    Bob.SendMessage(Alice);
+    Alice.DecryptMessage();
 
     return 0;
 }

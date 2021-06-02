@@ -13,7 +13,7 @@ struct PrivateKey {
     ZZ p, q, a;
 };
 
-struct Messege {
+struct Message {
     ZZ c1;
 };
 
@@ -22,12 +22,12 @@ public:
     RSAUser();
     void GenerateKey();
     void SendPublicKey(RSAUser&);
-    void SendMessege(RSAUser&);
-    void EncryptMessege();
-    void DecryptMessege();
+    void SendMessage(RSAUser&);
+    void EncryptMessage();
+    void DecryptMessage();
 
     PublicKey pk;
-    Messege M;
+    Message M;
 
 private:
     void createTempKey();

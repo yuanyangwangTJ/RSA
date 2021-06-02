@@ -20,12 +20,6 @@ void printChoose() {
 
 RSAUser::RSAUser() {
     cout << "Create RSA user " << endl;
-    // GenerateKey();
-    // cout << sk.p << endl;
-    // cout << sk.q << endl;
-    // cout << "a: " << sk.a << endl;
-    // cout << pk.n << endl;
-    // cout << pk.b << endl;
 
 }
 
@@ -73,10 +67,11 @@ void RSAUser::createTempKey() {
 }
 
 // 加密信息
-void RSAUser::EncryptMessege() {
+void RSAUser::EncryptMessage() {
     // 生成临时密钥
     createTempKey();
     cout << "Encrypt k = " << k << endl;
+    // 利用公钥加密 k 得到 c1，此处使用 ZZ_p 类计算
     ZZ_p::init(pk.n);
     ZZ_p k_p = to_ZZ_p(k);
     M.c1 = rep(power(k_p, pk.b));
@@ -84,7 +79,8 @@ void RSAUser::EncryptMessege() {
 }
 
 // 解密信息
-void RSAUser::DecryptMessege() {
+void RSAUser::DecryptMessage() {
+    // 利用密钥来解密 c1，得到临时密钥 k
     ZZ_p::init(pk.n);
     ZZ_p c1_p = to_ZZ_p(M.c1);
     k = rep(power(c1_p, sk.a));
@@ -92,6 +88,6 @@ void RSAUser::DecryptMessege() {
 }
 
 // 发送信息
-void RSAUser::SendMessege(RSAUser& A) {
+void RSAUser::SendMessage(RSAUser& A) {
     A.M = this->M;
 }
