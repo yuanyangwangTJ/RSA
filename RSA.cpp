@@ -7,6 +7,7 @@
 #include <iostream>
 #include <ctime>
 #include <NTL/ZZ.h>
+#include <NTL/ZZ_p.h>
 
 using namespace std;
 using namespace NTL;
@@ -40,9 +41,9 @@ void RSAUser::GenerateKey() {
     //     case '2': m = 16; break;
     //     default:  m = 8;
     // }
+    PrimeGen G(m);
     // 生成私钥的随机素数 p, q
     cout << "p and q are generating ...\n";
-    PrimeGen G(m);
     do {
         sk.p = G.GeneratePrime();
         sk.q = G.GeneratePrime();
@@ -63,4 +64,34 @@ void RSAUser::GenerateKey() {
 // 发送 RSA 公钥
 void RSAUser::SendPublicKey(RSAUser &B) {
     B.pk = this->pk;
+}
+
+// 创建临时密钥
+void RSAUser::createTempKey() {
+    PRNG G(2);
+    k = G.GenerateRandom();
+}
+
+// 加密信息
+void RSAUser::EncryptMessege() {
+    // 生成临时密钥
+    createTempKey();
+    cout << "Encrypt k = " << k << endl;
+    ZZ_p::init(pk.n);
+    ZZ_p k_p = to_ZZ_p(k);
+    M.c1 = rep(power(k_p, pk.b));
+
+}
+
+// 解密信息
+void RSAUser::DecryptMessege() {
+    ZZ_p::init(pk.n);
+    ZZ_p c1_p = to_ZZ_p(M.c1);
+    k = rep(power(c1_p, sk.a));
+    cout << "Decrypt k = " << k << endl;
+}
+
+// 发送信息
+void RSAUser::SendMessege(RSAUser& A) {
+    A.M = this->M;
 }

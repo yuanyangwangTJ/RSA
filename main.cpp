@@ -10,8 +10,9 @@ int main()
     RSAUser Alice, Bob;
     Alice.GenerateKey();
     Alice.SendPublicKey(Bob);
-    cout << Alice.pk.b << endl;
-    cout << Bob.pk.b << endl;
+    Bob.EncryptMessege();
+    Bob.SendMessege(Alice);
+    Alice.DecryptMessege();
 
     return 0;
 }

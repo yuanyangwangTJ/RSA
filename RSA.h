@@ -13,18 +13,26 @@ struct PrivateKey {
     ZZ p, q, a;
 };
 
+struct Messege {
+    ZZ c1;
+};
+
 class RSAUser {
 public:
     RSAUser();
     void GenerateKey();
     void SendPublicKey(RSAUser&);
-    void SendMessege(RSAUser);
+    void SendMessege(RSAUser&);
+    void EncryptMessege();
+    void DecryptMessege();
 
     PublicKey pk;
-
+    Messege M;
 
 private:
+    void createTempKey();
     PrivateKey sk;
+    ZZ k;       // 临时会话密钥
 
 };
 

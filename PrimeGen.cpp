@@ -11,7 +11,7 @@ using namespace std;
 using namespace NTL;
 
 PrimeGen::PrimeGen(int n) : PRNG(n) {
-    GeneratePrime(); 
+    cout << "Create a pseudorandom number generator.\n";
 }
 
 // 生成随机素数，使用 NTL 中库函数检验
