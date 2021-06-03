@@ -10,41 +10,16 @@
 using std::bitset;
 using namespace std;
 
-void PrintTest(byte plain[4*4]) {
-    for(int i = 0; i < 16; i++) {
-		cout << hex << plain[i].to_ulong() << " ";
-		if((i+1) % 4 == 0)
-			cout << endl;
-	}
-	cout << endl;
-}
 
 // 构造函数
-AES::AES() {
-    cout << "AES Create.\n";
-
-    byte key[16] = {0x2b, 0x7e, 0x15, 0x16, 
-            0x28, 0xae, 0xd2, 0xa6, 
-            0xab, 0xf7, 0x15, 0x88,
-            0x09, 0xcf, 0x4f, 0x3c};
- 
-	byte plain[16] = {0x32, 0x88, 0x31, 0xe0, 
-					0x43, 0x5a, 0x31, 0x37,
-					0xf6, 0x30, 0x98, 0x07,
-					0xa8, 0x8d, 0xa2, 0x34};
-
-    cout << "原文：\n";
-    PrintTest(plain);
+AES::AES(bitset<128> k) {
+    // 将输入的 128 比特的钥匙转化为字节形式
+    divideToBytes(k, key);
+    cout << "AES using secret key is creating...\n";
+    // 完成 AES 密钥扩展
     KeyExpansion(key);
-    AESEncrypt(plain);
-    cout << "密文：\n";
-    PrintTest(plain);
-    AESDecrypt(plain);
-    cout << "解密文：\n";
-    PrintTest(plain);
-
+    cout << "AES is ready.\n";
 }
-
 
 // SubWord 是对每四个字节使用 AES 的 S 盒
 word AES::SubWord(word &w) {
@@ -100,7 +75,7 @@ void AES::KeyExpansion(byte key[4*4]) {
 }
 
 // 轮密钥和明文逐比特异位运算
-void AES::AddRoundKey(byte plain[4*4], word k[4]) {
+void AES::AddRoundKey(byte bits[4*4], word k[4]) {
     // W[0,1,2,3] 分别与明文进行异或操作
     word k1, k2, k3, k4;
     for (int i = 0; i < 4; i++) {
@@ -108,10 +83,10 @@ void AES::AddRoundKey(byte plain[4*4], word k[4]) {
         k2 = (k[i] << 8) >> 24;
         k3 = (k[i] << 16) >> 24;
         k4 = (k[i] << 24) >> 24;
-        plain[i] = plain[i] ^ byte(k1.to_ulong());
-        plain[i+4] = plain[i+4] ^ byte(k2.to_ulong());
-        plain[i+8] = plain[i+8] ^ byte(k3.to_ulong());
-        plain[i+12] = plain[i+12] ^ byte(k4.to_ulong());
+        bits[i] = bits[i] ^ byte(k1.to_ulong());
+        bits[i+4] = bits[i+4] ^ byte(k2.to_ulong());
+        bits[i+8] = bits[i+8] ^ byte(k3.to_ulong());
+        bits[i+12] = bits[i+12] ^ byte(k4.to_ulong());
     }
 }
 
@@ -250,7 +225,12 @@ void AES::InvMixColumns(byte bits[4*4]) {
 }
 
 // AES 加密
-void AES::AESEncrypt(byte plain[4*4]) {
+bitset<128> AES::AESEncrypt(bitset<128> text) {
+    // 128 比特转化为 16 字节
+    byte plain[16];
+    divideToBytes(text, plain);
+
+    // 正式开始 AES 加密
     word wk[4];     // 存储回合密钥
     // 轮密钥 0 加密
     for (int i = 0; i < 4; i++) {
@@ -266,9 +246,7 @@ void AES::AESEncrypt(byte plain[4*4]) {
             wk[i] = W[4*r+i];
         }
         AddRoundKey(plain, wk);
-
     }
-
 
     // 第 10 轮加密，少 MixColumns 操作
     SubBytes(plain);
@@ -277,11 +255,16 @@ void AES::AESEncrypt(byte plain[4*4]) {
         wk[i] = W[4*Nr+i];
     }
     AddRoundKey(plain, wk);
-    
+    // 最终返回 128 比特的密文
+    return mergeBytes(plain);
 }
 
 // AES 解密
-void AES::AESDecrypt(byte cipher[4*4]) {
+bitset<128> AES::AESDecrypt(bitset<128> text) {
+    // 128 比特转化为 16 字节
+    byte cipher[16];
+    divideToBytes(text, cipher);
+
     word wk[4];     // 存储回合密钥
     // 解密第 10 轮加密
     for (int i = 0; i < 4; i++) {
@@ -306,4 +289,25 @@ void AES::AESDecrypt(byte cipher[4*4]) {
         wk[i] = W[i];
     }
     AddRoundKey(cipher, wk);
+
+    // 最终返回的是解密完成的 128 比特内容
+    return mergeBytes(cipher);
+}
+
+// 将 bitset<128> 分解为 16 个字节
+void AES::divideToBytes(bitset<128> in, byte text[4*4]) {
+    for (int i = 0; i < 16; i++) {
+        text[i] = (in << 8*i >> 120).to_ulong();
+    }
+}
+
+// 将 16 字节合并为 bitset<128>
+bitset<128> AES::mergeBytes(byte text[4*4]) {
+    bitset<128> res(0), tmp;
+    for (int i = 0; i < 16; i++) {
+        tmp = text[i].to_ulong();
+        tmp <<= 8 * (15 - i);
+        res |= tmp;
+    }
+    return res;
 }

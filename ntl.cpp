@@ -46,6 +46,9 @@ void PrintTest(byte bits[4]) {
 
 int main()
 {
+    bitset<4> t("1011");
+    t = t << 2*2 >> 1;
+    cout << t << endl;
     byte bits[4] = {
         0xdb, 0x13, 0x53, 0x45
     };

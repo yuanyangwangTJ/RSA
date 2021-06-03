@@ -57,13 +57,13 @@ const word Rcon[] = {
 
 class AES {
 public:
-    AES();
-    void AESEncrypt(byte plain[4*4]);
-	void AESDecrypt(byte cipher[4*4]);
+    AES(bitset<128>);
+    bitset<128> AESEncrypt(bitset<128>);
+	bitset<128> AESDecrypt(bitset<128>);
 
 private:
     void KeyExpansion(byte key[4*4]);
-    void AddRoundKey(byte plain[4*4], word k[4]);
+    void AddRoundKey(byte bits[4*4], word k[4]);
     void SubBytes(byte bits[4*4]);
     void ShiftRows(byte bits[4*4]);
     void MixColumns(byte bits[4*4]);
@@ -76,9 +76,11 @@ private:
 	void InvShiftRows(byte bits[4*4]);
 	void InvMixColumns(byte bits[4*4]);
 
+	void divideToBytes(bitset<128>, byte text[4*4]);
+	bitset<128> mergeBytes(byte text[4*4]);
+
     byte key[16];   // 密钥
     word W[4 * (Nr+1)];  // 回合密钥
-
 
 };
 
