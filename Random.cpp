@@ -1,6 +1,7 @@
 /**************************************
- * Class Name: PRNG
- * Function: 伪随机数比特生成器
+ * Class Name: PRNG, PrimeGen
+ * Function: 伪随机数与伪随机素数比特生成器
+ * Introduction: PrimeGen 继承于 PRNG 类
  * ***********************************/
 
 #include "Random.h"
@@ -14,6 +15,10 @@ using namespace std;
 using namespace NTL;
 
 typedef unsigned long long size_ul;
+
+/*---------------------------------
+ * Class: PRNG
+ *-------------------------------*/
 
 // 构造函数，进行初始化操作
 PRNG::PRNG(int n) {
@@ -109,4 +114,26 @@ void PRNG::PrintInDER() {
         }
     }
     cout << endl;
+}
+
+
+/*---------------------------------
+ * Class: PrimeGen
+ *-------------------------------*/
+
+PrimeGen::PrimeGen(int n) : PRNG(n) {
+    cout << "Create a pseudorandom number generator.\n";
+}
+
+// 生成随机素数，使用 NTL 中库函数检验
+// 素性检测算法为 Miller-Rabin 检测
+ZZ PrimeGen::GeneratePrime() {
+    ZZ res(0);
+    // 此处进行 srandom，为产生 64 比特随机种子
+    srandom((unsigned)time(NULL));
+    do {
+        res = GenerateRandom();
+    } while(!ProbPrime(res, m * 32));
+
+    return res;
 }
