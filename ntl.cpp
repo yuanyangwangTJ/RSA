@@ -1,5 +1,6 @@
 #include <NTL/ZZ.h>
 #include <iostream>
+#include <fstream>
 #include <bitset>
 
 using namespace std;
@@ -46,15 +47,21 @@ void PrintTest(byte bits[4]) {
 
 int main()
 {
-    bitset<4> t("1011");
-    t = t << 2*2 >> 1;
-    cout << t << endl;
-    byte bits[4] = {
-        0xdb, 0x13, 0x53, 0x45
-    };
-    PrintTest(bits);
-    MixColumns(bits);
-    PrintTest(bits);
-    
+    bitset<128> data[1024];
+    ifstream fin("1.txt", ios::binary);
+    ofstream fout("2.txt", ios::binary);
+
+    while (!fin.eof()) {
+        fin.read((char*)&data, 16*1024);
+        streamsize readNum = fin.gcount();
+        cout << readNum << " " << data << endl;
+        fout.write((char*)&data, readNum);
+
+    }
+    cout << data[0] << endl;
+    cout << data[1] << endl;
+
+    fin.close();
+    fout.close();
     return 0;
 }
