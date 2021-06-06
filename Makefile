@@ -24,7 +24,7 @@ LIBS    := -lntl -lgmp -lm
 output: main.o TDES.o Random.o RSA.o AES.o
 	g++ $(CXXFLAGS) main.o TDES.o Random.o RSA.o AES.o -o output $(LIBS)
 	
-main.o: main.cpp
+main.o: main.cpp Engine.hpp
 	g++ -c main.cpp
 
 TDES.o: TDES.cpp TDES.h
@@ -33,7 +33,7 @@ TDES.o: TDES.cpp TDES.h
 Random.o: Random.cpp Random.h
 	g++ -c -std=c++11 -pthread -march=native Random.cpp $(LIBS)
 
-RSA.o: Random.h RSA.h
+RSA.o: RSA.cpp Random.h RSA.h AES.h conio.hpp
 	g++ -c -std=c++11 -pthread -march=native RSA.cpp $(LIBS)
 
 AES.o: AES.cpp AES.h

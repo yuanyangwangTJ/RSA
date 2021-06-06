@@ -2,6 +2,7 @@
 #define _RSA_H_
 
 #include <NTL/ZZ.h>
+#include <cstring>
 
 using namespace NTL;
 
@@ -15,6 +16,7 @@ struct PrivateKey {
 
 struct Message {
     ZZ c1;
+    std::string fileName;
 };
 
 class RSAUser {
@@ -31,6 +33,7 @@ public:
 
 private:
     void createTempKey();
+    void viewKey();
     PrivateKey sk;
     ZZ k;       // 临时会话密钥
 

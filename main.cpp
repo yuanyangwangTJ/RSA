@@ -1,17 +1,8 @@
-#include "RSA.h"
-#include <NTL/ZZ.h>
-
-using namespace NTL;
-using namespace std;
+#include "Engine.hpp"
 
 int main()
 {
-    RSAUser Alice, Bob;
-    Alice.GenerateKey();
-    Alice.SendPublicKey(Bob);
-    Bob.EncryptMessage();
-    Bob.SendMessage(Alice);
-    Alice.DecryptMessage();
+    RSAEngine();
 
     return 0;
 }

@@ -32,6 +32,7 @@ void TDES::keyRead() {
         bitset<64> btmp(stmp);
         k[i] = btmp;
     }
+    fin.close();
 }
 
 // 对 56 位密钥的前后部分进行左移

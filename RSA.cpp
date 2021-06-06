@@ -15,6 +15,13 @@
 using namespace std;
 using namespace NTL;
 
+// _getch() 函数的系统移植问题解决
+#ifdef _WIN32
+#include <conio.h>
+#elif __linux__
+char _getch();
+#endif
+
 void printChoose() {
     cout << "Please choose the length of random prime: \n";
     cout << "1. 512  bits\n";
@@ -22,19 +29,28 @@ void printChoose() {
 }
 
 RSAUser::RSAUser() {
-    cout << "Create RSA user " << endl;
+    cout << "Create RSA user..." << endl;
 
 }
 
 void RSAUser::GenerateKey() {
     // 选择 RSA 素数的比特长度
-    int m = 8;
+    int m = 0;
     
     printChoose();
+    do {
+        char ch = _getch();
+        switch(ch) {
+            case '1': m = 8; break;
+            case '2': m = 16; break;
+            default: m = 0;
+        }
+    } while (m == 0);
 
     PrimeGen G(m);
+    cout << "public key and private key are generating...\n";
+
     // 生成私钥的随机素数 p, q
-    cout << "p and q are generating ...\n";
     do {
         sk.p = G.GeneratePrime();
         sk.q = G.GeneratePrime();
@@ -50,6 +66,49 @@ void RSAUser::GenerateKey() {
 
     // 使用 NTL 库中的求逆函数 InvModStatus()
     InvModStatus(sk.a, pk.b, Euler);
+    cout << "All keys have been generated !\n";
+    // 钥匙查看
+    viewKey();
+}
+
+// 查看钥匙
+void RSAUser::viewKey() {
+    // 查看公钥
+    cout << "Do you want to view public key, y/n ?\n";
+    char ch = _getch();
+
+    switch(ch) {
+        case 'Y':
+        case 'y': {
+            cout << "Public key\n";
+            cout << "n = " << pk.n << endl;
+            cout << "b = " << pk.b << endl;
+            break;
+        }
+        default: break;
+    }
+    // 查看私钥
+    cout << "Do you want to view private key, y/n ?\n";
+    ch = _getch();
+
+    if (ch == 'y' || ch == 'Y') {
+        cout << "Attention, please not reveal this information !!!\n";
+        cout << "Read the warning, continue, y/n ?\n";
+        ch = _getch();
+
+        switch(ch) {
+            case 'Y':
+            case 'y': {
+                cout << "Private key\n";
+                cout << "p = " << sk.p << endl;
+                cout << "q = " << sk.q << endl;
+                cout << "a = " << sk.a << endl;
+                break;
+            }
+            default: break;
+        }
+    }
+
 }
 
 // 发送 RSA 公钥
@@ -61,13 +120,23 @@ void RSAUser::SendPublicKey(RSAUser &B) {
 void RSAUser::createTempKey() {
     PRNG G(2);
     k = G.GenerateRandom();
+    cout << "Temp key has been created.\n";
+    cout << "Do you want to view temp key, y/n ?\n";
+    char ch = _getch();
+    switch (ch) {
+        case 'Y':
+        case 'y':
+            cout << "temp key = " << k << endl;
+            break;
+        default:
+            break;
+    }
 }
 
-// 加密信息
+// 加密信息，使用 CBC 模式
 void RSAUser::EncryptMessage() {
     // 生成临时密钥
     createTempKey();
-    cout << "Encrypt k = " << k << endl;
     // 利用公钥加密 k 得到 c1，此处使用 ZZ_p 类计算
     ZZ_p::init(pk.n);
     ZZ_p k_p = to_ZZ_p(k);
@@ -79,15 +148,23 @@ void RSAUser::EncryptMessage() {
     AES E(key);
 
     // 需要加密的文件路径输入
-    string fileName;
+    string fileName, newfileName;
     cout << "Please input the file path: \n";
     cin >> fileName;
+    _getch();   // 接收回车符
+
+    // 密文存储为 源文件名 + ".cipher"
+    newfileName = fileName + ".cipher";
+    // 文件名作为信息传输
+    M.fileName = fileName;
+
     // 打开文件
     ifstream fin(fileName, ios::binary);
-    ofstream fout("cipher.txt", ios::binary);
+    ofstream fout(newfileName, ios::binary);
 
     // 因为逐字符读取文件比较慢，使用缓存区的方式一次性读取 16*1024 字节
     bitset<128> buffer[1024];
+    // CBC 模式
     // former 记录密文 y(i-1) ，初始化为 0
     bitset<128> former(0);
     bitset<128> cipher;     // 密文
@@ -114,14 +191,13 @@ void RSAUser::EncryptMessage() {
                 streamsize k = j - end - 1;
                 buffer[i] = ((buffer[i] << k*8) ^ pkcs) >> k*8; 
             }
-            cout << buffer[i] << endl;
             cipher = E.AESEncrypt(former ^ buffer[i]);
             fout.write((char*)&cipher, 16);
         }
     }
 
     cout << "File encryption finished.\n";
-
+    cout << "Encrypted file is located at " << newfileName << endl;
     // 关闭文件
     fin.close();
     fout.close();
@@ -133,16 +209,39 @@ void RSAUser::DecryptMessage() {
     ZZ_p::init(pk.n);
     ZZ_p c1_p = to_ZZ_p(M.c1);
     k = rep(power(c1_p, sk.a));
-    cout << "Decrypt k = " << k << endl;
+    // 查看临时密钥
+    cout << "Temp key has been decrypted.\n";
+    cout << "Do you want to view temp key, y/n ?\n";
+    char ch = _getch();
+    switch (ch) {
+        case 'Y':
+        case 'y':
+            cout << "temp key = " << k << endl;
+            break;
+        default:
+            break;
+    }
 
     // 使用密钥 k 解密
     bitset<128> key(to_ulong(k));
     // 创建 AES 加密解密系统
     AES D(key);
 
+    // 密文文件
+    string fileName = M.fileName + ".cipher";
+    
+    // 查找文件的名称中的 '\' 或者 '/' 最后出现位置
+    int pos = M.fileName.length() - 1;
+    for (; pos >= 0; pos--) {
+        if (M.fileName[pos] == '/' || M.fileName[pos] == '\\')
+            break;
+    }
+    // 解密文件位置
+    string newfileName = M.fileName.insert(pos + 1, "new_");
+
     // 打开文件
-    ifstream fin("cipher.txt", ios::binary);
-    ofstream fout("2.txt", ios::binary);
+    ifstream fin(fileName, ios::binary);
+    ofstream fout(newfileName, ios::binary);
 
     // buffer 缓冲区读取
     bitset<128> buffer[1024];
@@ -172,12 +271,9 @@ void RSAUser::DecryptMessage() {
         // 处理 PKCS7Padding 结尾
         if (flag) {
             // end 表示额外填充的字节数
-            cout << buffer[i] << endl;
             // 最后一次解密
             plain = D.AESDecrypt(buffer[i]) ^ former;
-            cout << plain << endl;
             streamsize end = (plain >> 120).to_ulong();
-            cout << end << endl;
             for (streamsize j = 16; j > end; j--) {
                 // 最后的字节处理
                 bitset<8> text((plain << (j-1)*8 >> 120).to_ulong());
@@ -186,10 +282,10 @@ void RSAUser::DecryptMessage() {
         }
     }
 
-    cout << "File dencryption finished.\n";
+    cout << "File decryption finished.\n";
+    cout << "Decrypted file is located at " << newfileName << endl;
     fin.close();
     fout.close();
-
 }
 
 // 发送信息
