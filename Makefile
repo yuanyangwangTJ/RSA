@@ -7,7 +7,7 @@
 
 # compile and lib parameter
 # CC      := g++
-CXXFLAGS:= -g -O2 -std=c++11 -pthread -march=native
+CXXFLAGS:= -O3 -std=c++11 -pthread -march=native
 LIBS    := -lntl -lgmp -lm
 # LDFLAGS := 
 
